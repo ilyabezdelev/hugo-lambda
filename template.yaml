@@ -1,0 +1,126 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Transform: AWS::Serverless-2016-10-31
+Description: Hugo-Lambda
+Globals:
+    Function:
+        Timeout: 60
+        MemorySize: 512
+
+Parameters:
+    LayersBucketName:
+        Type: String
+    HugoLayerKey:
+        Type: String
+    LibstdcLayerKey:
+        Type: String
+    AWSCLILayerKey:
+        Type: String
+
+Resources:
+    HugoLambdaFunction:
+        Type: AWS::Serverless::Function
+        Properties:
+            CodeUri: app/
+            Handler: app.lambda_handler
+            Runtime: python3.7
+            Layers:
+                - !Ref HugoLayer
+                - !Ref LibstdcLayer
+                - !Ref AWSCLILayer
+            Policies:
+                - S3CrudPolicy:
+                    BucketName: !Ref SourceS3Bucket
+                - S3CrudPolicy:
+                    BucketName: !Ref WebsiteS3Bucket
+            Environment:
+                Variables:
+                    SOURCE_PATH: !Ref SourceS3Bucket
+                    DESTINATION_BUCKET: !Ref WebsiteS3Bucket
+            Events:
+                BuildApi:
+                    Type: Api
+                    Properties:
+                        Path: /build
+                        Method: get
+
+    SourceS3Bucket:
+        Type: AWS::S3::Bucket
+        DeletionPolicy: Retain
+
+    WebsiteS3Bucket:
+        Type: AWS::S3::Bucket
+        Properties:
+            AccessControl: PublicRead
+            WebsiteConfiguration:
+                IndexDocument: index.html
+                ErrorDocument: 404.html
+        DeletionPolicy: Retain
+
+    WebsiteS3BucketPolicy:
+        Type: AWS::S3::BucketPolicy
+        Properties:
+            PolicyDocument:
+                Id: WebsiteS3BucketPolicy
+                Version: 2012-10-17
+                Statement:
+                    - Sid: PublicReadForGetBucketObjects
+                      Effect: Allow
+                      Principal: '*'
+                      Action: 's3:GetObject'
+                      Resource: !Join ['',['arn:aws:s3:::',!Ref WebsiteS3Bucket,/*]]
+            Bucket: !Ref WebsiteS3Bucket
+
+    HugoLayer:
+        Type: "AWS::Lambda::LayerVersion"
+        Properties:
+            CompatibleRuntimes: 
+                - python3.6
+                - python3.7
+            Content: 
+                S3Bucket: !Ref LayersBucketName
+                S3Key: !Ref HugoLayerKey
+            Description: Contains Hugo
+            LayerName: Hugo
+    
+    LibstdcLayer:
+        Type: "AWS::Lambda::LayerVersion"
+        Properties:
+            CompatibleRuntimes: 
+                - python3.6
+                - python3.7
+            Content: 
+                S3Bucket: !Ref LayersBucketName
+                S3Key: !Ref LibstdcLayerKey
+            Description: Contains libstdc++.so.6
+            LayerName: libstdc
+    
+    AWSCLILayer:
+        Type: "AWS::Lambda::LayerVersion"
+        Properties:
+            CompatibleRuntimes: 
+                - python3.6
+                - python3.7
+            Content: 
+                S3Bucket: !Ref LayersBucketName
+                S3Key: !Ref AWSCLILayerKey
+            Description: Contains AWSCLI
+            LayerName: AWSCLI
+
+Outputs:
+    WebsiteS3Bucket:
+        Value: !Ref WebsiteS3Bucket
+
+    WebsiteS3BucketURL:
+        Value: !GetAtt WebsiteS3Bucket.WebsiteURL
+    
+    SourceS3Bucket:
+        Value: !Ref SourceS3Bucket
+
+    BuildApi:
+        Value: !Sub "https://${ServerlessRestApi}.execute-api.${AWS::Region}.amazonaws.com/Prod/build/"
+
+    HugoLambdaFunctionArn:
+        Value: !GetAtt HugoLambdaFunction.Arn
+    
+    HugoLayerArn:
+        Value: !Ref HugoLayer

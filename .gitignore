@@ -1,0 +1,9 @@
+.vs_code
+.DS_Store
+*/.DS_Store
+deploy.sh
+run_local.sh
+packaged.yaml
+layers
+layers/*
+env_vars.json

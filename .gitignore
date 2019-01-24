@@ -1,4 +1,4 @@
-.vs_code
+.vscode
 .DS_Store
 */.DS_Store
 deploy.sh

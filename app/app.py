@@ -2,18 +2,11 @@ import subprocess
 import os
 import logging
 
-# TODO:
-# * Test with and without trailing slashes
-# * Provide examples of input parameters
-# * Talk to arnab and ask how to package with all the dependencies
-# * README
-# * SAM template with deps
-
 # Environment variables
 LOCAL_SOURCE_DIR = '/tmp/hugo_source'
 LOCAL_BUILD_DIR = '/tmp/hugo_build'
-SOURCE_S3_BUCKET_PATH = os.environ['SOURCE_PATH']
-DESTINATION_BUCKET = os.environ['DESTINATION_BUCKET']
+SOURCE_S3_BUCKET_PATH = os.environ['SOURCE_PATH'] # e.g. "mybucket" or "mybucket/site_directory"
+DESTINATION_BUCKET = os.environ['DESTINATION_BUCKET'] # e.g. "mywebsitebucket"
 
 # Setting up a logger with a more readable format
 logger = logging.getLogger()

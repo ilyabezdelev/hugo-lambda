@@ -18,7 +18,7 @@ The repo includes the following contents:
 # 2. Edit deployment template
 
 * Copy `deploy_template.sh` to `deploy.sh`.
-* Do `chmod u+x deploy.sh` to set the execution permissions.
+* Execute `chmod u+x deploy.sh` to set the execution permissions.
 * Open `deploy.sh` in a text editor and make the following changes:
     - In `export SOURCE_CODE_BUCKET=BUCKETNAME` replace `BUCKETNAME` with the name of an S3 bucket that will be used for temporary storage of layers and Lambda's code.
     - In `export HUGO_LAYER_FILE_NAME=lambda-layer-hugo-0.54.zip` change the name of the zip file to whatever you named your `hugo` layer.

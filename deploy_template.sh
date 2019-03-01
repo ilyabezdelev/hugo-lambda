@@ -1,8 +1,8 @@
 export SOURCE_CODE_BUCKET=BUCKETNAME
 export STACK_NAME=hugo-lambda
-export HUGO_LAYER_FILE_NAME=hugo-layer.zip
-export LIBSTDC_LAYER_FILE_NAME=libstdc-layer.zip
-export AWSCLI_LAYER_FILE_NAME=awscli-layer.zip
+export HUGO_LAYER_FILE_NAME=lambda-layer-hugo-0.54.zip
+export LIBSTDC_LAYER_FILE_NAME=lambda-layer-libstdc.zip
+export AWSCLI_LAYER_FILE_NAME=lambda-layer-awscli-1.16.115.zip
 
 # copy contents of layers to S3
 aws s3 sync layers/ s3://${SOURCE_CODE_BUCKET}
